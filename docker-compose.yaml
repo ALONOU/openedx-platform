@@ -203,6 +203,9 @@ services:
     image: caddy:2.7.4
     container_name: openedx-caddy
     restart: unless-stopped
+    labels:
+      - "coolify.managed=true"
+      - "coolify.type=application"
     volumes:
       - caddy_data:/data
       - caddy_config:/config
