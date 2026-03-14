@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Persistance Coolify – À remplir par projet</title>
+  <style>
+    body { font-family: Calibri, Arial, sans-serif; margin: 2cm; line-height: 1.4; }
+    h1 { font-size: 18pt; border-bottom: 1px solid #333; padding-bottom: 4px; }
+    h2 { font-size: 14pt; margin-top: 1.2em; }
+    h3 { font-size: 12pt; margin-top: 1em; }
+    table { border-collapse: collapse; width: 100%; margin: 0.5em 0; }
+    th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; }
+    th { background: #eee; font-weight: bold; }
+    .done { width: 60px; text-align: center; }
+    .note { font-size: 0.9em; color: #444; font-style: italic; }
+    ul { margin: 0.3em 0; }
+    .instruction { background: #f8f8f8; padding: 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+
+<h1>Persistance des données sur Coolify (serveur alonu)</h1>
+<p><strong>Objectif :</strong> ne perdre aucune donnée entre deux déploiements.</p>
+
+<div class="instruction">
+  <strong>Comment ajouter un Storage :</strong> Ouvre l’app dans Coolify → onglet <strong>Storages</strong> → <strong>Add</strong> → renseigne <strong>Name</strong> et <strong>Destination Path</strong> (type Volume).
+</div>
+
+<h2>1. Deux cas selon le type d’application</h2>
+<table>
+  <tr><th>Type</th><th>Où configurer</th><th>Section Storages Coolify</th></tr>
+  <tr><td>Docker Compose</td><td>Dans le docker-compose.yaml (volumes: ./data/...)</td><td>Rien à ajouter</td></tr>
+  <tr><td>Dockerfile / Image / Nixpacks</td><td>Interface Coolify : Storages → Add</td><td>C’est ici que tu ajoutes les chemins</td></tr>
+</table>
+
+<h2>2. Fiche par projet – À remplir</h2>
+<p>Pour chaque projet : ouvre l’app dans Coolify → Storages → Add, puis ajoute les lignes indiquées. Coche ou note quand c’est fait.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Projet</th>
+      <th>Storages à ajouter (Name → Destination Path)</th>
+      <th class="done">Fait ? (à remplir)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>agro-deal (Dockerfile)</td>
+      <td>storage → /app/storage &nbsp;|&nbsp; bootstrap-cache → /app/bootstrap/cache</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>alonu-data-deletion (Static)</td>
+      <td>Rien à faire</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>coecept-backend-new (Dockerfile)</td>
+      <td>storage → /app/storage &nbsp;|&nbsp; bootstrap-cache → /app/bootstrap/cache</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>fedsport-wbsc (Dockerfile)</td>
+      <td>storage → /app/storage &nbsp;|&nbsp; bootstrap-cache → /app/bootstrap/cache</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>iadessbackend (Dockerfile)</td>
+      <td>storage → /app/storage &nbsp;|&nbsp; bootstrap-cache → /app/bootstrap/cache</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>togo-fedsport-network (Dockerfile)</td>
+      <td>storage → /app/storage &nbsp;|&nbsp; bootstrap-cache → /app/bootstrap/cache</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>coecept-frontend (Dockerfile)</td>
+      <td>Rien (ou uploads → /app/public/uploads si besoin)</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>administration-territoriale (Dockerfile)</td>
+      <td>storage → /app/storage &nbsp;|&nbsp; bootstrap-cache → /app/bootstrap/cache</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>iades frontend (Dockerfile)</td>
+      <td>Rien (ou uploads si besoin)</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>delivery-tracking (Dockerfile)</td>
+      <td>storage → /app/storage &nbsp;|&nbsp; bootstrap-cache → /app/bootstrap/cache</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>alonu-backend (Dockerfile)</td>
+      <td>storage → /app/storage &nbsp;|&nbsp; bootstrap-cache → /app/bootstrap/cache</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>archivage-ministere (Dockerfile)</td>
+      <td>storage → /app/storage &nbsp;|&nbsp; data → /app/data &nbsp;|&nbsp; bootstrap-cache → /app/bootstrap/cache</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>alonu-frontend (Dockerfile)</td>
+      <td>Rien (ou uploads si besoin)</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>openedx-platform-mvp (Nixpacks)</td>
+      <td>Si Docker Compose : rien. Sinon : data → /app/data, media → /app/media</td>
+      <td class="done"></td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>archivage (Dockerfile)</td>
+      <td>storage → /app/storage &nbsp;|&nbsp; data → /app/data &nbsp;|&nbsp; bootstrap-cache → /app/bootstrap/cache</td>
+      <td class="done"></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Rempli par :</strong> _____________________ &nbsp;&nbsp; <strong>Date :</strong> _____________________</p>
+
+<h2>3. Détail par projet (référence)</h2>
+
+<h3>1. agro-deal</h3>
+<p>Storages → Add : storage → /app/storage ; bootstrap-cache → /app/bootstrap/cache. (Si Node/Next : /app/data ou /app/.next/cache.)</p>
+
+<h3>2. alonu-data-deletion</h3>
+<p>Rien à faire (app statique).</p>
+
+<h3>3. coecept-backend-new</h3>
+<p>storage → /app/storage ; bootstrap-cache → /app/bootstrap/cache. (Si API Node/Python : /app/data ou /app/uploads.)</p>
+
+<h3>4. fedsport-wbsc</h3>
+<p>storage → /app/storage ; bootstrap-cache → /app/bootstrap/cache.</p>
+
+<h3>5. iadessbackend</h3>
+<p>storage → /app/storage ; bootstrap-cache → /app/bootstrap/cache.</p>
+
+<h3>6. togo-fedsport-network</h3>
+<p>storage → /app/storage ; bootstrap-cache → /app/bootstrap/cache.</p>
+
+<h3>7. coecept-frontend</h3>
+<p>Rien sauf si uploads : uploads → /app/public/uploads.</p>
+
+<h3>8. administration-territoriale</h3>
+<p>storage → /app/storage ; bootstrap-cache → /app/bootstrap/cache.</p>
+
+<h3>9. iades frontend</h3>
+<p>Rien sauf uploads : uploads → /app/public/uploads.</p>
+
+<h3>10. delivery-tracking</h3>
+<p>storage → /app/storage ; bootstrap-cache → /app/bootstrap/cache.</p>
+
+<h3>11. alonu-backend</h3>
+<p>storage → /app/storage ; bootstrap-cache → /app/bootstrap/cache.</p>
+
+<h3>12. archivage-ministere</h3>
+<p>storage → /app/storage ; data → /app/data ; bootstrap-cache → /app/bootstrap/cache.</p>
+
+<h3>13. alonu-frontend</h3>
+<p>Rien sauf uploads : uploads → /app/public/uploads.</p>
+
+<h3>14. openedx-platform-mvp</h3>
+<p>Si Docker Compose (lms, cms, mysql…) : rien. Si une seule image : data → /app/data, media → /app/media.</p>
+
+<h3>15. archivage</h3>
+<p>storage → /app/storage ; data → /app/data ; bootstrap-cache → /app/bootstrap/cache.</p>
+
+<h2>4. Résumé</h2>
+<ul>
+  <li>Storages = persistance pour les apps Dockerfile / Image / Nixpacks. Création dans Coolify : Storages → Add.</li>
+  <li>Docker Compose = persistance déjà dans le compose (volumes: ./data/...).</li>
+  <li>Une fois chaque Storage ajouté, les redéploiements ne feront plus perdre les données.</li>
+</ul>
+
+</body>
+</html>
