@@ -87,6 +87,7 @@ services:
       DJANGO_SETTINGS_MODULE: lms.envs.production
     volumes:
       - ./openedx-native/config/lms:/openedx/config:ro
+      - ./openedx-native/config/lms/production.py:/openedx/edx-platform/lms/envs/production.py:ro
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
       - openedx_static:/openedx/staticfiles
@@ -112,6 +113,7 @@ services:
       DJANGO_SETTINGS_MODULE: cms.envs.production
     volumes:
       - ./openedx-native/config/cms:/openedx/config:ro
+      - ./openedx-native/config/cms/production.py:/openedx/edx-platform/cms/envs/production.py:ro
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
       - openedx_static:/openedx/staticfiles
@@ -138,6 +140,7 @@ services:
       C_FORCE_ROOT: "1"
     volumes:
       - ./openedx-native/config/lms:/openedx/config:ro
+      - ./openedx-native/config/lms/production.py:/openedx/edx-platform/lms/envs/production.py:ro
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
     networks:
@@ -158,6 +161,7 @@ services:
       C_FORCE_ROOT: "1"
     volumes:
       - ./openedx-native/config/cms:/openedx/config:ro
+      - ./openedx-native/config/cms/production.py:/openedx/edx-platform/cms/envs/production.py:ro
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
     networks:
