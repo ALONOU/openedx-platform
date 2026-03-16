@@ -139,6 +139,7 @@ flushdb.sh
 build
 /src/
 \#*\#
+.env
 .env/
 openedx/core/djangoapps/django_comment_common/comment_client/python
 openedx/core/djangoapps/cache_toolbox/__pycache__

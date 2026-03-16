@@ -1,7 +1,10 @@
+# Open edX - Docker Compose pour Coolify
+# Coolify/Traefik gère le reverse proxy et SSL. Pas de Caddy.
+# Variables: .env à la racine (voir .env.example).
+
 version: '3.8'
 
 services:
-  # MySQL 8.4 - Primary relational database
   mysql:
     image: mysql:8.4.0
     container_name: openedx-mysql
@@ -13,7 +16,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./openedx-native/config/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
+      - ./config/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
     networks:
       - openedx
     healthcheck:
@@ -23,7 +26,6 @@ services:
       retries: 5
       start_period: 30s
 
-  # MongoDB 7.0 - Content metadata and modulestore
   mongodb:
     image: mongo:7.0.28
     container_name: openedx-mongodb
@@ -43,7 +45,6 @@ services:
       retries: 5
       start_period: 30s
 
-  # Redis 7.4 - Caching, sessions, and Celery message broker
   redis:
     image: redis:7.4.5
     container_name: openedx-redis
@@ -59,7 +60,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Meilisearch 1.8 - Search functionality
   meilisearch:
     image: getmeili/meilisearch:v1.8.4
     container_name: openedx-meilisearch
@@ -77,22 +77,24 @@ services:
       timeout: 5s
       retries: 5
 
-  # LMS - Learning Management System (learner interface)
   lms:
     image: overhangio/openedx:21.0.1-indigo
     container_name: openedx-lms
     restart: unless-stopped
+    env_file: .env
     environment:
       SERVICE_VARIANT: lms
       DJANGO_SETTINGS_MODULE: lms.envs.production
     volumes:
-      - ./openedx-native/config/lms:/openedx/config:ro
-      - ./openedx-native/config/lms/production.py:/openedx/edx-platform/lms/envs/production.py:ro
+      - ./config/lms:/openedx/config:ro
+      - ./config/lms/production.py:/openedx/edx-platform/lms/envs/production.py:ro
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
       - openedx_static:/openedx/staticfiles
     networks:
       - openedx
+    ports:
+      - "8000:8000"
     depends_on:
       mysql:
         condition: service_healthy
@@ -103,22 +105,24 @@ services:
       meilisearch:
         condition: service_healthy
 
-  # CMS - Content Management System (Studio - authoring interface)
   cms:
     image: overhangio/openedx:21.0.1-indigo
     container_name: openedx-cms
     restart: unless-stopped
+    env_file: .env
     environment:
       SERVICE_VARIANT: cms
       DJANGO_SETTINGS_MODULE: cms.envs.production
     volumes:
-      - ./openedx-native/config/cms:/openedx/config:ro
-      - ./openedx-native/config/cms/production.py:/openedx/edx-platform/cms/envs/production.py:ro
+      - ./config/cms:/openedx/config:ro
+      - ./config/cms/production.py:/openedx/edx-platform/cms/envs/production.py:ro
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
       - openedx_static:/openedx/staticfiles
     networks:
       - openedx
+    ports:
+      - "8001:8001"
     depends_on:
       mysql:
         condition: service_healthy
@@ -129,18 +133,18 @@ services:
       meilisearch:
         condition: service_healthy
 
-  # LMS Celery Worker - Asynchronous task processing for LMS
   lms-worker:
     image: overhangio/openedx:21.0.1-indigo
     container_name: openedx-lms-worker
     restart: unless-stopped
+    env_file: .env
     environment:
       SERVICE_VARIANT: lms
       DJANGO_SETTINGS_MODULE: lms.envs.production
       C_FORCE_ROOT: "1"
     volumes:
-      - ./openedx-native/config/lms:/openedx/config:ro
-      - ./openedx-native/config/lms/production.py:/openedx/edx-platform/lms/envs/production.py:ro
+      - ./config/lms:/openedx/config:ro
+      - ./config/lms/production.py:/openedx/edx-platform/lms/envs/production.py:ro
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
     networks:
@@ -150,18 +154,18 @@ services:
       - redis
     command: celery --app=lms.celery worker --loglevel=info --max-tasks-per-child=100
 
-  # CMS Celery Worker - Asynchronous task processing for CMS
   cms-worker:
     image: overhangio/openedx:21.0.1-indigo
     container_name: openedx-cms-worker
     restart: unless-stopped
+    env_file: .env
     environment:
       SERVICE_VARIANT: cms
       DJANGO_SETTINGS_MODULE: cms.envs.production
       C_FORCE_ROOT: "1"
     volumes:
-      - ./openedx-native/config/cms:/openedx/config:ro
-      - ./openedx-native/config/cms/production.py:/openedx/edx-platform/cms/envs/production.py:ro
+      - ./config/cms:/openedx/config:ro
+      - ./config/cms/production.py:/openedx/edx-platform/cms/envs/production.py:ro
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
     networks:
@@ -171,30 +175,6 @@ services:
       - redis
     command: celery --app=cms.celery worker --loglevel=info --max-tasks-per-child=100
 
-  # Caddy 2.7 - Reverse proxy with automatic HTTPS
-  # NOTE: Ports are NOT exposed here - Coolify's Traefik handles external routing
-  caddy:
-    image: caddy:2.7.4
-    container_name: openedx-caddy
-    restart: unless-stopped
-    labels:
-      - "coolify.managed=true"
-      - "coolify.type=application"
-    volumes:
-      - ./openedx-native/config/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-      - openedx_static:/openedx/staticfiles:ro
-      - openedx_media:/openedx/media:ro
-    networks:
-      - openedx
-      - coolify
-    depends_on:
-      - lms
-      - cms
-    command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
-
-# Named volumes for data persistence
 volumes:
   mysql_data:
     name: openedx_mysql_data
@@ -210,16 +190,8 @@ volumes:
     name: openedx_data
   openedx_static:
     name: openedx_static
-  caddy_data:
-    name: openedx_caddy_data
-  caddy_config:
-    name: openedx_caddy_config
 
-# Bridge network for service communication
 networks:
   openedx:
     name: openedx
     driver: bridge
-  coolify:
-    external: true
-    name: coolify
