@@ -17,6 +17,8 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 # ============================================================================
 # LOGGING CONFIGURATION
 # ============================================================================
+# Créer le répertoire des logs au démarrage (volume peut être vide en Docker)
+os.makedirs('/openedx/data/logs', exist_ok=True)
 
 LOGGING = {
     'version': 1,
