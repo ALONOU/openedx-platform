@@ -136,6 +136,7 @@ INSTALLED_APPS = [
     
     # Third-party (MVP required)
     'rest_framework',
+    'celery_utils',
     'django_celery_results',
     'storages',  # For media file handling
     

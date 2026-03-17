@@ -137,13 +137,13 @@ INSTALLED_APPS = [
     'lms.djangoapps.grades',
     'lms.djangoapps.instructor',
     'lms.djangoapps.instructor_task',
-    'lms.djangoapps.course_groups',  # Cohorts
     'lms.djangoapps.bulk_email',
     'lms.djangoapps.verify_student',
     'lms.djangoapps.student',
     
     # Third-party (MVP required)
     'rest_framework',
+    'celery_utils',
     'django_celery_results',
     'storages',  # For media file handling
     
