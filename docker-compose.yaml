@@ -1,5 +1,5 @@
 # Open edX - Docker Compose pour Coolify (v4)
-# Avec "Preserve repository" activé : les montages ./config/ fonctionnent.
+# Config LMS/CMS dans l'image (Dockerfile.openedx). Plus de montages ./config → évite l'erreur Coolify.
 # Variables : à définir dans Coolify (Application → Environment).
 
 version: '3.8'
@@ -78,16 +78,16 @@ services:
       retries: 5
 
   lms:
-    image: overhangio/openedx:21.0.1-indigo
+    build:
+      context: .
+      dockerfile: Dockerfile.openedx
+    image: openedx-custom:latest
     container_name: openedx-lms
     restart: unless-stopped
     environment:
       SERVICE_VARIANT: lms
       DJANGO_SETTINGS_MODULE: lms.envs.production
     volumes:
-      - ./config/lms:/openedx/config:ro
-      - ./config/lms/common.py:/openedx/edx-platform/lms/envs/common.py:ro
-      - ./config/lms/production.py:/openedx/edx-platform/lms/envs/production.py:ro
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
       - openedx_static:/openedx/staticfiles
@@ -106,16 +106,13 @@ services:
         condition: service_healthy
 
   cms:
-    image: overhangio/openedx:21.0.1-indigo
+    image: openedx-custom:latest
     container_name: openedx-cms
     restart: unless-stopped
     environment:
       SERVICE_VARIANT: cms
       DJANGO_SETTINGS_MODULE: cms.envs.production
     volumes:
-      - ./config/cms:/openedx/config:ro
-      - ./config/cms/common.py:/openedx/edx-platform/cms/envs/common.py:ro
-      - ./config/cms/production.py:/openedx/edx-platform/cms/envs/production.py:ro
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
       - openedx_static:/openedx/staticfiles
@@ -134,7 +131,7 @@ services:
         condition: service_healthy
 
   lms-worker:
-    image: overhangio/openedx:21.0.1-indigo
+    image: openedx-custom:latest
     container_name: openedx-lms-worker
     restart: unless-stopped
     environment:
@@ -142,9 +139,6 @@ services:
       DJANGO_SETTINGS_MODULE: lms.envs.production
       C_FORCE_ROOT: "1"
     volumes:
-      - ./config/lms:/openedx/config:ro
-      - ./config/lms/common.py:/openedx/edx-platform/lms/envs/common.py:ro
-      - ./config/lms/production.py:/openedx/edx-platform/lms/envs/production.py:ro
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
     networks:
@@ -155,7 +149,7 @@ services:
     command: celery --app=lms.celery worker --loglevel=info --max-tasks-per-child=100
 
   cms-worker:
-    image: overhangio/openedx:21.0.1-indigo
+    image: openedx-custom:latest
     container_name: openedx-cms-worker
     restart: unless-stopped
     environment:
@@ -163,9 +157,6 @@ services:
       DJANGO_SETTINGS_MODULE: cms.envs.production
       C_FORCE_ROOT: "1"
     volumes:
-      - ./config/cms:/openedx/config:ro
-      - ./config/cms/common.py:/openedx/edx-platform/cms/envs/common.py:ro
-      - ./config/cms/production.py:/openedx/edx-platform/cms/envs/production.py:ro
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
     networks:
