@@ -1,13 +1,12 @@
 # Image Open edX avec config intégrée (plus de montage ./config en Coolify)
 FROM overhangio/openedx:21.0.1-indigo
 
-# Config LMS (production.py importe .common donc les deux dans envs/)
-COPY config/lms/common.py /openedx/edx-platform/lms/envs/common.py
+# Config LMS (on garde le common.py upstream, on override production.py)
 COPY config/lms/production.py /openedx/edx-platform/lms/envs/production.py
 COPY config/lms /openedx/config/lms
 
 # Config CMS
-COPY config/cms/common.py /openedx/edx-platform/cms/envs/common.py
+# Config CMS (on garde le common.py upstream, on override production.py)
 COPY config/cms/production.py /openedx/edx-platform/cms/envs/production.py
 COPY config/cms /openedx/config/cms
 
