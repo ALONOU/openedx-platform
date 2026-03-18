@@ -52,6 +52,24 @@ CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', f'redis://{REDIS_HOST}:{
 LANGUAGE_CODE = os.environ.get('LANGUAGE_CODE', LANGUAGE_CODE)
 TIME_ZONE = os.environ.get('TIME_ZONE', TIME_ZONE)
 
+# URLs (Open edX upstream laisse LMS_ROOT_URL=None → requis pour les Derived())
+LMS_ROOT_URL = os.environ.get('LMS_ROOT_URL') or 'http://localhost:8000'
+CMS_ROOT_URL = os.environ.get('CMS_ROOT_URL') or 'http://localhost:8001'
+
+# Cache: forcer Redis (évite memcached + adresse mal formée type "6379/0")
+_redis_cache_location = os.environ.get('DJANGO_CACHE_LOCATION') or f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': _redis_cache_location,
+        'OPTIONS': {'CLIENT_CLASS': 'django_redis.client.DefaultClient'},
+        'TIMEOUT': int(os.environ.get('CACHE_TIMEOUT', '300')),
+    }
+}
+
+# Celery: Open edX lit surtout BROKER_URL
+BROKER_URL = os.environ.get('BROKER_URL') or CELERY_BROKER_URL
+
 # ============================================================================
 # LOGGING CONFIGURATION
 # ============================================================================
