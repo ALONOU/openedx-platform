@@ -5,6 +5,7 @@ Production Django settings for Open edX LMS (Native Setup)
 
 import os
 from .common import *
+from openedx.core.lib.derived import derive_settings
 
 # ============================================================================
 # PRODUCTION SETTINGS
@@ -141,3 +142,6 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
         'django.template.loaders.app_directories.Loader',
     ]),
 ]
+
+# Finalise les settings "Derived(...)" d'Open edX (ex: LOCALE_PATHS doit être une liste)
+derive_settings(__name__)
