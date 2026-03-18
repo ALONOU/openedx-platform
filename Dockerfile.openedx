@@ -6,8 +6,12 @@ COPY config/lms/production.py /openedx/edx-platform/lms/envs/production.py
 COPY config/lms /openedx/config/lms
 
 # Config CMS
-# Config CMS (on garde le common.py upstream, on override production.py)
 COPY config/cms/production.py /openedx/edx-platform/cms/envs/production.py
 COPY config/cms /openedx/config/cms
+
+# Migrations au démarrage (seed DB) puis commande d’origine (uwsgi/celery)
+COPY bin/entrypoint-with-migrate.sh /openedx/bin/entrypoint-with-migrate.sh
+RUN chmod +x /openedx/bin/entrypoint-with-migrate.sh
+ENTRYPOINT ["/openedx/bin/entrypoint-with-migrate.sh"]
 
 # Même image pour lms, cms et workers (SERVICE_VARIANT + DJANGO_SETTINGS_MODULE au runtime)
