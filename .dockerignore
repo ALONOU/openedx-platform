@@ -101,6 +101,8 @@ common/test/data/badges/*.png
 **/.vagrant/
 **/node_modules
 **/bin/
+# Inclure notre script d'entrypoint à la racine (exception à la règle ci-dessus)
+!bin/
 
 ### Static assets pipeline artifacts
 **/*.scssc
