@@ -11,7 +11,7 @@ COPY config/cms /openedx/config/cms
 
 # Migrations au démarrage (seed DB) puis commande d’origine (uwsgi/celery)
 COPY bin/entrypoint-with-migrate.sh /openedx/bin/entrypoint-with-migrate.sh
-RUN chmod +x /openedx/bin/entrypoint-with-migrate.sh
-ENTRYPOINT ["/openedx/bin/entrypoint-with-migrate.sh"]
+# Appel via sh pour éviter chmod au build (Coolify peut faire échouer RUN chmod)
+ENTRYPOINT ["/bin/bash", "/openedx/bin/entrypoint-with-migrate.sh"]
 
 # Même image pour lms, cms et workers (SERVICE_VARIANT + DJANGO_SETTINGS_MODULE au runtime)
