@@ -53,8 +53,8 @@ CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', f'redis://{REDIS_HOST}:{
 LANGUAGE_CODE = os.environ.get('LANGUAGE_CODE', LANGUAGE_CODE)
 TIME_ZONE = os.environ.get('TIME_ZONE', TIME_ZONE)
 
-# Fichiers média (évite les écritures vers /edx non autorisées en conteneur)
-MEDIA_ROOT = os.environ.get('MEDIA_ROOT', '/openedx/media')
+# Fichiers média (volume data généralement writable en conteneur)
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT', '/openedx/data/media')
 os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 # URLs (Open edX upstream laisse LMS_ROOT_URL=None → requis pour les Derived())

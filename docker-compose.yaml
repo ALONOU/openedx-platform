@@ -87,6 +87,7 @@ services:
     environment:
       SERVICE_VARIANT: lms
       DJANGO_SETTINGS_MODULE: lms.envs.production
+      RUN_MIGRATIONS: "1"
     volumes:
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
@@ -112,6 +113,7 @@ services:
     environment:
       SERVICE_VARIANT: cms
       DJANGO_SETTINGS_MODULE: cms.envs.production
+      RUN_MIGRATIONS: "0"
     volumes:
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
@@ -138,6 +140,7 @@ services:
       SERVICE_VARIANT: lms
       DJANGO_SETTINGS_MODULE: lms.envs.production
       C_FORCE_ROOT: "1"
+      RUN_MIGRATIONS: "0"
     volumes:
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data
@@ -156,6 +159,7 @@ services:
       SERVICE_VARIANT: cms
       DJANGO_SETTINGS_MODULE: cms.envs.production
       C_FORCE_ROOT: "1"
+      RUN_MIGRATIONS: "0"
     volumes:
       - openedx_media:/openedx/media
       - openedx_data:/openedx/data

@@ -2,12 +2,14 @@
 set -e
 cd /openedx/edx-platform
 
-# Migrations LMS puis CMS
-python manage.py lms migrate --noinput
-python manage.py cms migrate --noinput
+# Eviter les migrations concurrentes: uniquement dans le conteneur LMS
+if [[ "${RUN_MIGRATIONS:-0}" == "1" ]]; then
+  python manage.py lms migrate --noinput
+  python manage.py cms migrate --noinput
+fi
 
 # Création superuser au 1er démarrage si les variables sont définies
-if [[ -n "${ADMIN_USERNAME:-}" && -n "${ADMIN_PASSWORD:-}" ]]; then
+if [[ "${RUN_MIGRATIONS:-0}" == "1" && -n "${ADMIN_USERNAME:-}" && -n "${ADMIN_PASSWORD:-}" ]]; then
   python manage.py lms createsuperuser \
     --noinput \
     --username "${ADMIN_USERNAME}" \
