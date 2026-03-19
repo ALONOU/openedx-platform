@@ -60,6 +60,11 @@ os.makedirs(MEDIA_ROOT, exist_ok=True)
 # URLs (Open edX upstream laisse LMS_ROOT_URL=None → requis pour les Derived())
 LMS_ROOT_URL = os.environ.get('LMS_ROOT_URL') or 'http://localhost:8000'
 CMS_ROOT_URL = os.environ.get('CMS_ROOT_URL') or 'http://localhost:8001'
+# Studio authoring MFE URL (requis par Open edX Studio header)
+COURSE_AUTHORING_MICROFRONTEND_URL = (
+    os.environ.get('COURSE_AUTHORING_MICROFRONTEND_URL')
+    or f"{CMS_ROOT_URL.rstrip('/')}/authoring"
+)
 
 # Cache: forcer Redis (évite memcached + adresse mal formée type "6379/0")
 _redis_cache_location = os.environ.get('DJANGO_CACHE_LOCATION') or f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
