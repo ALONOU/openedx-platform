@@ -38,6 +38,7 @@ CONTENTSTORE['DOC_STORE_CONFIG'].update({
     'db': os.environ.get('MONGO_DATABASE', CONTENTSTORE['DOC_STORE_CONFIG'].get('db')),
     'user': os.environ.get('MONGO_USER', CONTENTSTORE['DOC_STORE_CONFIG'].get('user')),
     'password': os.environ.get('MONGO_PASSWORD', CONTENTSTORE['DOC_STORE_CONFIG'].get('password')),
+    'authsource': os.environ.get('MONGO_AUTH_SOURCE', 'admin'),
 })
 MODULESTORE['default']['DOC_STORE_CONFIG'] = CONTENTSTORE['DOC_STORE_CONFIG']
 
@@ -51,6 +52,10 @@ CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', f'redis://{REDIS_HOST}:{
 # Locale
 LANGUAGE_CODE = os.environ.get('LANGUAGE_CODE', LANGUAGE_CODE)
 TIME_ZONE = os.environ.get('TIME_ZONE', TIME_ZONE)
+
+# Fichiers média (évite les écritures vers /edx non autorisées en conteneur)
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT', '/openedx/media')
+os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 # URLs (Open edX upstream laisse LMS_ROOT_URL=None → requis pour les Derived())
 LMS_ROOT_URL = os.environ.get('LMS_ROOT_URL') or 'http://localhost:8000'
