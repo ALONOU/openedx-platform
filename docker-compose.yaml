@@ -131,7 +131,7 @@ services:
         condition: service_healthy
       meilisearch:
         condition: service_healthy
-    command: uwsgi --ini /openedx/config/cms/uwsgi.ini
+    command: python manage.py cms runserver 0.0.0.0:8000
 
   lms-worker:
     image: openedx-custom:latest
