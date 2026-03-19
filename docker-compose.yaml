@@ -105,6 +105,8 @@ services:
         condition: service_healthy
       meilisearch:
         condition: service_healthy
+    # Production: utiliser uWSGI (static-map configuré dans config/lms/uwsgi.ini)
+    command: uwsgi --ini /openedx/config/lms/uwsgi.ini
 
   cms:
     image: openedx-custom:latest
