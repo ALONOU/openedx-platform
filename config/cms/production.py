@@ -4,6 +4,7 @@ Production Django settings for Open edX CMS/Studio (Native Setup)
 """
 
 import os
+import json
 from .common import *
 from openedx.core.lib.derived import derive_settings
 
@@ -86,6 +87,18 @@ SOCIAL_AUTH_EDX_OAUTH2_KEY = _env_not_none('SOCIAL_AUTH_EDX_OAUTH2_KEY', 'studio
 SOCIAL_AUTH_EDX_OAUTH2_SECRET = _env_not_none('SOCIAL_AUTH_EDX_OAUTH2_SECRET', 'studio-sso-secret')
 SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = os.environ.get('SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT', LMS_ROOT_URL)
 SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT = os.environ.get('SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT', LMS_ROOT_URL)
+
+# JWT auth signing keys (Studio/LMS SSO, JWT login flows)
+_jwt_private_signing_jwk = os.environ.get('JWT_PRIVATE_SIGNING_JWK')
+_jwt_public_signing_jwk_set = os.environ.get('JWT_PUBLIC_SIGNING_JWK_SET')
+if _jwt_private_signing_jwk:
+    JWT_AUTH['JWT_PRIVATE_SIGNING_JWK'] = _jwt_private_signing_jwk
+if _jwt_public_signing_jwk_set:
+    # Accepte une valeur JSON minifiée en env; fallback sur la chaîne brute.
+    try:
+        JWT_AUTH['JWT_PUBLIC_SIGNING_JWK_SET'] = json.dumps(json.loads(_jwt_public_signing_jwk_set))
+    except ValueError:
+        JWT_AUTH['JWT_PUBLIC_SIGNING_JWK_SET'] = _jwt_public_signing_jwk_set
 
 # Cache: forcer Redis (évite memcached + adresse mal formée type "6379/0")
 _redis_cache_location = os.environ.get('DJANGO_CACHE_LOCATION') or f'redis://{REDIS_HOST}:{REDIS_PORT}/0'

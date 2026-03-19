@@ -4,6 +4,7 @@ Production Django settings for Open edX LMS (Native Setup)
 """
 
 import os
+import json
 from .common import *
 from openedx.core.lib.derived import derive_settings
 
@@ -63,6 +64,18 @@ except OSError:
 # URLs (Open edX upstream laisse LMS_ROOT_URL=None → requis pour les Derived())
 LMS_ROOT_URL = os.environ.get('LMS_ROOT_URL') or 'http://localhost:8000'
 CMS_ROOT_URL = os.environ.get('CMS_ROOT_URL') or 'http://localhost:8001'
+
+# JWT auth signing keys (Studio/LMS SSO, JWT login flows)
+_jwt_private_signing_jwk = os.environ.get('JWT_PRIVATE_SIGNING_JWK')
+_jwt_public_signing_jwk_set = os.environ.get('JWT_PUBLIC_SIGNING_JWK_SET')
+if _jwt_private_signing_jwk:
+    JWT_AUTH['JWT_PRIVATE_SIGNING_JWK'] = _jwt_private_signing_jwk
+if _jwt_public_signing_jwk_set:
+    # Accepte une valeur JSON minifiée en env; fallback sur la chaîne brute.
+    try:
+        JWT_AUTH['JWT_PUBLIC_SIGNING_JWK_SET'] = json.dumps(json.loads(_jwt_public_signing_jwk_set))
+    except ValueError:
+        JWT_AUTH['JWT_PUBLIC_SIGNING_JWK_SET'] = _jwt_public_signing_jwk_set
 
 # Cache: forcer Redis (évite memcached + adresse mal formée type "6379/0")
 _redis_cache_location = os.environ.get('DJANGO_CACHE_LOCATION') or f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
