@@ -36,7 +36,8 @@ if [[ "${RUN_MIGRATIONS:-0}" == "1" ]]; then
   STUDIO_REDIRECT_URI="${CMS_ROOT_URL%/}/complete/edx-oauth2/"
   # Ne pas masquer totalement les erreurs : si l'app OAuth ne se crée pas, Studio aura client_id=None.
   set +e
-  python manage.py lms manage_user studio_worker "${ADMIN_EMAIL:-admin@example.com}" --unusable-password
+  STUDIO_WORKER_EMAIL="${STUDIO_WORKER_EMAIL:-studio-worker@localhost}"
+  python manage.py lms manage_user studio_worker "${STUDIO_WORKER_EMAIL}" --unusable-password
   _manage_user_ec=$?
   python manage.py lms create_dot_application studio-sso studio_worker \
     --grant-type authorization-code \
