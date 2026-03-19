@@ -70,8 +70,20 @@ COURSE_AUTHORING_MICROFRONTEND_URL = (
     or f"{CMS_ROOT_URL.rstrip('/')}/authoring"
 )
 # OAuth Studio <-> LMS (évite /login/edx-oauth2/None/...)
-SOCIAL_AUTH_EDX_OAUTH2_KEY = os.environ.get('SOCIAL_AUTH_EDX_OAUTH2_KEY', 'studio-sso')
-SOCIAL_AUTH_EDX_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_EDX_OAUTH2_SECRET', 'studio-sso-secret')
+def _env_not_none(name: str, default: str) -> str:
+    """
+    Normalise les variables d'env qui peuvent arriver avec des valeurs littérales
+    type 'None'/'null' depuis certaines UIs (Coolify, etc.).
+    """
+    val = os.environ.get(name)
+    if val is None:
+        return default
+    if isinstance(val, str) and val.strip().lower() in {"", "none", "null"}:
+        return default
+    return val
+
+SOCIAL_AUTH_EDX_OAUTH2_KEY = _env_not_none('SOCIAL_AUTH_EDX_OAUTH2_KEY', 'studio-sso')
+SOCIAL_AUTH_EDX_OAUTH2_SECRET = _env_not_none('SOCIAL_AUTH_EDX_OAUTH2_SECRET', 'studio-sso-secret')
 SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = os.environ.get('SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT', LMS_ROOT_URL)
 SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT = os.environ.get('SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT', LMS_ROOT_URL)
 

@@ -131,7 +131,8 @@ services:
         condition: service_healthy
       meilisearch:
         condition: service_healthy
-    command: python manage.py cms runserver 0.0.0.0:8000
+    # Production: utiliser uWSGI (static-map configuré dans config/cms/uwsgi.ini)
+    command: uwsgi --ini /openedx/config/cms/uwsgi.ini
 
   lms-worker:
     image: openedx-custom:latest

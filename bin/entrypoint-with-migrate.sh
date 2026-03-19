@@ -21,10 +21,23 @@ if [[ "${RUN_MIGRATIONS:-0}" == "1" ]]; then
   fi
 
   # OAuth Studio -> LMS: créer/metre à jour le client DOT pour éviter client_id=None dans Studio
-  STUDIO_OAUTH_CLIENT_ID="${SOCIAL_AUTH_EDX_OAUTH2_KEY:-studio-sso}"
-  STUDIO_OAUTH_CLIENT_SECRET="${SOCIAL_AUTH_EDX_OAUTH2_SECRET:-studio-sso-secret}"
+  _raw_oauth_key="${SOCIAL_AUTH_EDX_OAUTH2_KEY:-}"
+  _raw_oauth_secret="${SOCIAL_AUTH_EDX_OAUTH2_SECRET:-}"
+  if [[ -z "${_raw_oauth_key}" || "${_raw_oauth_key}" == "None" || "${_raw_oauth_key}" == "null" ]]; then
+    STUDIO_OAUTH_CLIENT_ID="studio-sso"
+  else
+    STUDIO_OAUTH_CLIENT_ID="${_raw_oauth_key}"
+  fi
+  if [[ -z "${_raw_oauth_secret}" || "${_raw_oauth_secret}" == "None" || "${_raw_oauth_secret}" == "null" ]]; then
+    STUDIO_OAUTH_CLIENT_SECRET="studio-sso-secret"
+  else
+    STUDIO_OAUTH_CLIENT_SECRET="${_raw_oauth_secret}"
+  fi
   STUDIO_REDIRECT_URI="${CMS_ROOT_URL%/}/complete/edx-oauth2/"
-  python manage.py lms manage_user studio_worker "${ADMIN_EMAIL:-admin@example.com}" --unusable-password || true
+  # Ne pas masquer totalement les erreurs : si l'app OAuth ne se crée pas, Studio aura client_id=None.
+  set +e
+  python manage.py lms manage_user studio_worker "${ADMIN_EMAIL:-admin@example.com}" --unusable-password
+  _manage_user_ec=$?
   python manage.py lms create_dot_application studio-sso studio_worker \
     --grant-type authorization-code \
     --skip-authorization \
@@ -32,7 +45,15 @@ if [[ "${RUN_MIGRATIONS:-0}" == "1" ]]; then
     --scopes "user_id" \
     --client-id "${STUDIO_OAUTH_CLIENT_ID}" \
     --client-secret "${STUDIO_OAUTH_CLIENT_SECRET}" \
-    --update || true
+    --update
+  _create_dot_ec=$?
+  set -e
+  if [[ "${_manage_user_ec}" -ne 0 ]]; then
+    echo "[entrypoint] manage_user studio_worker failed (exit ${_manage_user_ec})"
+  fi
+  if [[ "${_create_dot_ec}" -ne 0 ]]; then
+    echo "[entrypoint] create_dot_application failed (exit ${_create_dot_ec})"
+  fi
 fi
 
 # Création superuser au 1er démarrage si les variables sont définies
