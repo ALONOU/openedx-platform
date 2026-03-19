@@ -55,7 +55,11 @@ TIME_ZONE = os.environ.get('TIME_ZONE', TIME_ZONE)
 
 # Fichiers média (volume data généralement writable en conteneur)
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', '/openedx/data/media')
-os.makedirs(MEDIA_ROOT, exist_ok=True)
+try:
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
+except OSError:
+    # Ne pas faire échouer l'import Django si le volume n'est pas encore writable (uid/gid)
+    pass
 
 # URLs (Open edX upstream laisse LMS_ROOT_URL=None → requis pour les Derived())
 LMS_ROOT_URL = os.environ.get('LMS_ROOT_URL') or 'http://localhost:8000'
@@ -88,8 +92,35 @@ BROKER_URL = os.environ.get('BROKER_URL') or CELERY_BROKER_URL
 # ============================================================================
 # LOGGING CONFIGURATION
 # ============================================================================
-# Créer le répertoire des logs au démarrage (volume peut être vide en Docker)
-os.makedirs('/openedx/data/logs', exist_ok=True)
+# Par défaut: stdout uniquement (Coolify/Docker). RotatingFileHandler sur volume peut
+# provoquer PermissionError au boot → crash-loop si /openedx/data/logs n'est pas writable.
+_use_file_logging = os.environ.get('DJANGO_USE_FILE_LOGGING', '0') == '1'
+_log_handlers = ['console']
+_handlers = {
+    'console': {
+        'class': 'logging.StreamHandler',
+        'formatter': 'standard',
+        'level': os.environ.get('LOG_LEVEL', 'INFO'),
+    },
+}
+if _use_file_logging:
+    try:
+        os.makedirs('/openedx/data/logs', exist_ok=True)
+        test_path = '/openedx/data/logs/.write_test'
+        with open(test_path, 'a'):
+            pass
+        os.remove(test_path)
+        _handlers['file'] = {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/openedx/data/logs/cms.log',
+            'maxBytes': 10485760,  # 10MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+            'level': 'INFO',
+        }
+        _log_handlers = ['console', 'file']
+    except OSError:
+        pass
 
 LOGGING = {
     'version': 1,
@@ -102,29 +133,15 @@ LOGGING = {
             'format': '%(asctime)s [%(levelname)s] %(name)s [%(filename)s:%(lineno)d]: %(message)s'
         },
     },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'standard',
-            'level': os.environ.get('LOG_LEVEL', 'INFO'),
-        },
-        'file': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/openedx/data/logs/cms.log',
-            'maxBytes': 10485760,  # 10MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-            'level': 'INFO',
-        },
-    },
+    'handlers': _handlers,
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': list(_log_handlers),
             'level': 'INFO',
             'propagate': False,
         },
         'django.request': {
-            'handlers': ['console', 'file'],
+            'handlers': list(_log_handlers),
             'level': 'ERROR',
             'propagate': False,
         },
@@ -134,12 +151,12 @@ LOGGING = {
             'propagate': False,
         },
         'celery': {
-            'handlers': ['console', 'file'],
+            'handlers': list(_log_handlers),
             'level': 'INFO',
             'propagate': False,
         },
         '': {
-            'handlers': ['console', 'file'],
+            'handlers': list(_log_handlers),
             'level': 'INFO',
         },
     },
