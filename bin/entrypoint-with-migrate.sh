@@ -6,6 +6,20 @@ cd /openedx/edx-platform
 if [[ "${RUN_MIGRATIONS:-0}" == "1" ]]; then
   python manage.py lms migrate --noinput
   python manage.py cms migrate --noinput
+
+  # OAuth Studio -> LMS: créer/metre à jour le client DOT pour éviter client_id=None dans Studio
+  STUDIO_OAUTH_CLIENT_ID="${SOCIAL_AUTH_EDX_OAUTH2_KEY:-studio-sso}"
+  STUDIO_OAUTH_CLIENT_SECRET="${SOCIAL_AUTH_EDX_OAUTH2_SECRET:-studio-sso-secret}"
+  STUDIO_REDIRECT_URI="${CMS_ROOT_URL%/}/complete/edx-oauth2/"
+  python manage.py lms manage_user studio_worker "${ADMIN_EMAIL:-admin@example.com}" --unusable-password || true
+  python manage.py lms create_dot_application studio-sso studio_worker \
+    --grant-type authorization-code \
+    --skip-authorization \
+    --redirect-uris "${STUDIO_REDIRECT_URI}" \
+    --scopes "user_id,profile,email" \
+    --client-id "${STUDIO_OAUTH_CLIENT_ID}" \
+    --client-secret "${STUDIO_OAUTH_CLIENT_SECRET}" \
+    --update || true
 fi
 
 # Création superuser au 1er démarrage si les variables sont définies

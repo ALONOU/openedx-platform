@@ -65,6 +65,11 @@ COURSE_AUTHORING_MICROFRONTEND_URL = (
     os.environ.get('COURSE_AUTHORING_MICROFRONTEND_URL')
     or f"{CMS_ROOT_URL.rstrip('/')}/authoring"
 )
+# OAuth Studio <-> LMS (évite /login/edx-oauth2/None/...)
+SOCIAL_AUTH_EDX_OAUTH2_KEY = os.environ.get('SOCIAL_AUTH_EDX_OAUTH2_KEY', 'studio-sso')
+SOCIAL_AUTH_EDX_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_EDX_OAUTH2_SECRET', 'studio-sso-secret')
+SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = os.environ.get('SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT', LMS_ROOT_URL)
+SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT = os.environ.get('SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT', LMS_ROOT_URL)
 
 # Cache: forcer Redis (évite memcached + adresse mal formée type "6379/0")
 _redis_cache_location = os.environ.get('DJANGO_CACHE_LOCATION') or f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
