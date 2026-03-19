@@ -105,6 +105,7 @@ services:
         condition: service_healthy
       meilisearch:
         condition: service_healthy
+    command: uwsgi --ini /openedx/config/lms/uwsgi.ini
 
   cms:
     image: openedx-custom:latest
@@ -131,6 +132,7 @@ services:
         condition: service_healthy
       meilisearch:
         condition: service_healthy
+    command: uwsgi --ini /openedx/config/cms/uwsgi.ini
 
   lms-worker:
     image: openedx-custom:latest
