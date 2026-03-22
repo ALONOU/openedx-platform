@@ -77,6 +77,9 @@ if _jwt_public_signing_jwk_set:
     except ValueError:
         JWT_AUTH['JWT_PUBLIC_SIGNING_JWK_SET'] = _jwt_public_signing_jwk_set
 
+# OAuth2 provider LMS : expose /oauth2/* pour le SSO Studio → LMS (authorize, token).
+FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
+
 # Cache: forcer Redis (évite memcached + adresse mal formée type "6379/0")
 _redis_cache_location = os.environ.get('DJANGO_CACHE_LOCATION') or f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
 CACHES = {
