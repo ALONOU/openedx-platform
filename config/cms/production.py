@@ -65,11 +65,9 @@ except OSError:
 # URLs (Open edX upstream laisse LMS_ROOT_URL=None → requis pour les Derived())
 LMS_ROOT_URL = os.environ.get('LMS_ROOT_URL') or 'http://localhost:8000'
 CMS_ROOT_URL = os.environ.get('CMS_ROOT_URL') or 'http://localhost:8001'
-# Studio authoring MFE URL (requis par Open edX Studio header)
-COURSE_AUTHORING_MICROFRONTEND_URL = (
-    os.environ.get('COURSE_AUTHORING_MICROFRONTEND_URL')
-    or f"{CMS_ROOT_URL.rstrip('/')}/authoring"
-)
+# Ne pas forcer COURSE_AUTHORING_MICROFRONTEND_URL ici.
+# En production sans frontend-app-course-authoring déployé, la valeur par défaut
+# (None) évite une redirection vers /authoring/home qui mène à une 404.
 # OAuth Studio <-> LMS (évite /login/edx-oauth2/None/...)
 def _env_not_none(name: str, default: str) -> str:
     """
